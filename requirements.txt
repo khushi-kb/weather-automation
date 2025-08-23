@@ -1,2 +1,3 @@
 requests
-sendgrid
+matplotlib
+python-dotenv
