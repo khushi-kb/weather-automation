@@ -17,10 +17,16 @@ def send_email(subject, content):
     sendgrid_api_key = os.getenv('SENDGRID_API_KEY')
     sender_email = os.getenv('SENDER_EMAIL')
     recipient_email = os.getenv('RECIPIENT_EMAIL')
+    recipient_list = [email.strip() for email in recipient_email.split(',')]
+
+    if not all([sendgrid_api_key, sender_email, recipient_email]):
+        print("Missing one or more environment variables.")
+        return
+
 
     message = Mail(
         from_email=sender_email,
-        to_emails=recipient_email,
+        to_emails=recipient_list,
         subject=subject,
         plain_text_content=content
     )
@@ -33,7 +39,7 @@ def send_email(subject, content):
         print(f"Error sending email: {e}")
 
 def main():
-    city = "Noida"  # Change this to your desired city
+    city = "Noida" 
     weather_data = fetch_weather(city)
 
     if weather_data.get("cod") != 200:
