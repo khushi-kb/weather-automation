@@ -34,7 +34,7 @@ def get_weather(city):
         "units": UNITS,
     }
     response = requests.get(OWM_URL, params=params, verify=False)
-    response.raise_for_status()
+    response.raise_for_status() 
     return response.json()
 
 def format_weather_report(data):
