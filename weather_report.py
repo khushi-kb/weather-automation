@@ -1,10 +1,12 @@
 import os
 import requests
 import certifi
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+
+IST = timezone(timedelta(hours=5, minutes=30))
 
 load_dotenv()
 
@@ -23,8 +25,8 @@ CITY = "Noida"
 OWM_URL = "https://api.openweathermap.org/data/2.5/weather"
 UNITS = "metric"  # Celsius
 
-def unix_to_localtime(unix_timestamp, tz_offset_sec):
-    dt = datetime.utcfromtimestamp(unix_timestamp + tz_offset_sec)
+def unix_to_localtime(unix_timestamp, tz_info=IST):
+    dt = datetime.fromtimestamp(unix_timestamp, tz=tz_info)
     return dt.strftime("%H:%M:%S")
 
 def get_weather(city):
@@ -75,8 +77,8 @@ def format_weather_report(data):
   - Cloudiness: {clouds.get("all", "N/A")}%
 
 🌅 Sunrise & Sunset (local time):
-  - Sunrise: {unix_to_localtime(sys.get("sunrise", 0), timezone_offset)}
-  - Sunset: {unix_to_localtime(sys.get("sunset", 0), timezone_offset)}
+  - - Sunrise: {unix_to_localtime(sys.get("sunrise", 0))}
+  - - Sunset: {unix_to_localtime(sys.get("sunset", 0))}
 
 ☔ Precipitation:
   - Rain volume (last 1h or 3h): {rain_vol if rain_vol is not None else "0"} mm
@@ -108,7 +110,7 @@ def main():
     print(f"Fetching weather data for {CITY}...")
     weather_data = get_weather(CITY)
     report = format_weather_report(weather_data)
-    subject = f"Weather Report for {CITY} - {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}"
+    subject = f"Weather Report for {CITY} - {datetime.now(IST).strftime('%Y-%m-%d %H:%M IST')}"
     print("Sending email...")
     send_email(subject, report, SENDER_EMAIL, RECIPIENT_EMAIL, SENDGRID_API_KEY)
 
